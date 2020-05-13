@@ -2,6 +2,7 @@
 
 TURN_SERVER=turn.sjrg.de
 REALM=sjrg.de
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 add-apt-repository ppa:certbot/certbot
 apt update
@@ -12,7 +13,7 @@ apt -y install coturn certbot
 certbot certonly --standalone --preferred-challenges http --deploy-hook "systemctl restart coturn" -d $TURN_SERVER
 
 # Coturn
-cp turnserver.conf /etc/turnserver.conf
+cp $DIR/turnserver.conf /etc/turnserver.conf
 sed -e "s|%TURN_SERVER|$TURN_SERVER|g" -i /etc/turnserver.conf
 sed -e "s|%REALM|$REALM|g" -i /etc/turnserver.conf
 AUTH_SECRET=$(openssl rand -hex 25)
@@ -20,7 +21,7 @@ sed -e "s|%AUTH_SECRET|$AUTH_SECRET|g" -i /etc/turnserver.conf
 
 echo "Auth Secret: $AUTH_SECRET"
 
-cp logrotate /etc/logrotate.d/turn
+cp $DIR/logrotate /etc/logrotate.d/turn
 
 touch /etc/default/coturn
 echo "TURNSERVER_ENABLED=1" > /etc/default/coturn
