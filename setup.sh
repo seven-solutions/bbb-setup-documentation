@@ -117,3 +117,20 @@ API_BASE_URL=$(bbb-conf --secret | grep -oP 'URL: \Khttp(s)?://.*$')api/
 API_SECRET=$(bbb-conf --secret | grep -oP 'Secret: \K.*$')
 " > /root/bbb-exporter/secrets.env
 docker-compose up -d
+
+### Optional: Add Placetel phone number
+
+# Use the SIP device users here, not the web interface user
+PLACETEL_USER=
+PLACETEL_PASSWORD=
+PLACETEL_NUMBER=
+
+wget $CONFIG_URL/sip_profile_placetel.xml -O /opt/freeswitch/conf/sip_profile/external/freeswitch.xml
+sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/sip_profile/external/freeswitch.xml
+sed -e "s|%PLACETEL_PASSWORD%|$PLACETEL_PASSWORD|g" -i /opt/freeswitch/conf/sip_profile/external/freeswitch.xml
+
+wget $CONFIG_URL/dialplan_placetel.xml -O /opt/freeswitch/conf/dialplan/public/freeswitch.xml
+sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/dialplan/public/freeswitch.xml
+
+sed -e "s|^defaultDialAccessNumber=.*$|defaultDialAccessNumber=$PLACETEL_NUMBER|g" -i /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+

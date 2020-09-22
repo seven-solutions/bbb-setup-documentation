@@ -1,0 +1,10 @@
+<!-- /opt/freeswitch/conf/sip_profiles/external/placetel.xml -->
+<include>
+  <gateway name="placetel">
+    <param name="proxy" value="fpbx.de"/>
+    <param name="username" value="%PLACETEL_USER%"/>
+    <param name="password" value="%PLACETEL_PASSWORD%"/>
+    <param name="register" value="true"/>
+    <param name="context" value="public"/>
+  </gateway>
+</include>

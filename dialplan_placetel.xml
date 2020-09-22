@@ -1,0 +1,21 @@
+<!-- /opt/freeswitch/conf/dialplan/public/placetel.xml -->
+<extension name="from_placetel">
+ <condition field="destination_number" expression="^%PLACETEL_USER%">
+   <action application="answer"/>
+   <action application="sleep" data="1000"/>
+   <action application="play_and_get_digits" data="5 5 3 7000 # custom/conference_pin.mp3 custom/wrong_entry.mp3 pin \d+ 7000 1 XML hangup"/>
+   <action application="transfer" data="SEND_TO_CONFERENCE XML public"/>
+ </condition>
+</extension>
+
+<extension name="check_if_conference_active">
+ <condition field="${conference ${pin} list}" expression="/sofia/g">
+    <anti-action application="playback" data="custom/no_conference.mp3" />
+    <anti-action application="transfer" data="1 XML hangup" />
+ </condition>
+ <condition field="destination_number" expression="^SEND_TO_CONFERENCE$">
+   <action application="set" data="bbb_authorized=true"/>
+   <action application="playback" data="custom/explanation.mp3" />
+   <action application="transfer" data="${pin} XML default"/>
+ </condition>
+</extension>
