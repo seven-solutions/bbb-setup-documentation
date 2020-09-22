@@ -22,7 +22,7 @@ apt update
 apt -y install certbot
 apt -y install nginx openssl apache2-utils
 
-wget -qO- https://ubuntu.bigbluebutton.org/bbb-install.sh | bash -s -- -v xenial-22 -s $SERVER_URL -e $LE_EMAIL -g
+wget -qO- https://ubuntu.bigbluebutton.org/bbb-install.sh | bash -s -- -v xenial-22 -s $SERVER_URL -e $LE_EMAIL -g -c $TURN_SERVER:$TURN_SERVER_SECRET
 
 ### Setup Hostname and SSL
 

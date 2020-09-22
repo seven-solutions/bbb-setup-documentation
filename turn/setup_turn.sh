@@ -1,8 +1,9 @@
 #!/bin/bash
 
-TURN_SERVER=turn.sjrg.de
-REALM=sjrg.de
+TURN_SERVER=turn.datenanfragen.de
+REALM=datenanfragen.de
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+CONFIG_URL=https://raw.githubusercontent.com/seven-solutions/bbb-setup-documentation/master/
 
 add-apt-repository ppa:certbot/certbot
 apt update
@@ -13,7 +14,7 @@ apt -y install coturn certbot
 certbot certonly --standalone --preferred-challenges http --deploy-hook "systemctl restart coturn" -d $TURN_SERVER
 
 # Coturn
-cp $DIR/turnserver.conf /etc/turnserver.conf
+wget $CONFIG_URL/turn/turnserver.conf -O /etc/turnserver.conf
 sed -e "s|%TURN_SERVER|$TURN_SERVER|g" -i /etc/turnserver.conf
 sed -e "s|%REALM|$REALM|g" -i /etc/turnserver.conf
 AUTH_SECRET=$(openssl rand -hex 25)
@@ -21,7 +22,7 @@ sed -e "s|%AUTH_SECRET|$AUTH_SECRET|g" -i /etc/turnserver.conf
 
 echo "Auth Secret: $AUTH_SECRET"
 
-cp $DIR/logrotate /etc/logrotate.d/turn
+wget $CONFIG_URL/turn/logrotate -O /etc/logrotate.d/turn
 
 touch /etc/default/coturn
 echo "TURNSERVER_ENABLED=1" > /etc/default/coturn
