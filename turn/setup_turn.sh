@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TURN_SERVER=turn.datenanfragen.de
-REALM=datenanfragen.de
+TURN_SERVER=
+REALM=
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CONFIG_URL=https://raw.githubusercontent.com/seven-solutions/bbb-setup-documentation/master/
 
