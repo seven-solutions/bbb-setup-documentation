@@ -147,3 +147,36 @@ sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/dialplan/pub
 
 sed -e "s|^defaultDialAccessNumber=.*$|defaultDialAccessNumber=$PLACETEL_NUMBER|g" -i /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 
+# Firewall
+echo -e "
+# Placetel firewall rules
+ufw allow from 185.79.24.0/22 to any port 5060
+ufw allow from 185.79.24.0/22 to any port 8933
+ufw deny from any to any port 5060
+ufw deny from any to any port 8933" >> /etc/bigbluebutton/bbb-conf/apply-config.sh
+
+bbb-conf --restart
+
+### Custom greenlight
+# Clone the correct custom branch
+mv ~/greenlight ~/greenlight_old
+cd ~/greenlight_old
+docker-compose down
+cd ~
+git clone https://github.com/seven-solutions/greenlight.git
+git checkout custom # or choose a branded custom branch
+cp ~/greenlight-old/.env ~/greenlight/.env
+cp -r ~/greenlight-old/db ~/greenlight/
+cp ~/greenlight_old/docker-compose.yml ~/greenlight/docker-compose.yml
+yq w -i ~/greenlight/docker-compose.yml services.app.image 'greenlight-custom:release-v2'
+./scripts/image_build.sh greenlight-custom release-v2
+docker-compose up -d
+
+# bbb-rec-perm
+git clone https://github.com/ichdasich/bbb-rec-perm
+apt -y install fcgiwrap python3-bcrypt python3-psycopg2 python3-bs4
+mv bbb-rec-perm/gl-auth/auth-passwd-bbb.py /var/www/html/gl-auth/auth.py
+db_pass=$(cat docker-compose.yml | grep -oP 'POSTGRES_PASSWORD=\K.*$');
+sed -i -e 's/password=PASSWORD/password='$db_pass'/g' /var/www/html/gl-auth/auth.py
+cp -r ~/bbb-rec-perm/nginx-config/etc/bigbluebutton/nginx/* /etc/bigbluebutton/nginx
+wget $CONFIG_URL/bbb-rec-perm.nginx -O /etc/bigbluebutton/nginx/bbb-rec-perm.nginx
