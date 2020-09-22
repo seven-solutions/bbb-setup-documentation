@@ -33,6 +33,10 @@ rm /etc/nginx/sites-enabled/default
 wget $CONFIG_URL/ssl.conf -O /etc/nginx/ssl/ssl.conf
 sed -e "s|%SERVER_URL|$SERVER_URL|g" -i /etc/nginx/sites-available/bigbluebutton
 sed -e "s|%SERVER_URL|$SERVER_URL|g" -i /etc/nginx/ssl/ssl.conf
+if [ ! -f /etc/nginx/ssl/dhp-4096.pem ]; then
+    openssl dhparam -out /etc/nginx/ssl/dhp-4096.pem 4096
+fi
+
 
 ### IPv6
 
