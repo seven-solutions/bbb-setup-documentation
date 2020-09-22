@@ -68,9 +68,4 @@ server {
     location = /50x.html {
         root /var/www/nginx-default;
     }
-
-    # Redirect url root to greenlight
-    location / {
-        return 307 /b;
-    }
 }
