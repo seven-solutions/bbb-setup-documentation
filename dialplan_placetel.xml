@@ -3,7 +3,7 @@
  <condition field="destination_number" expression="^%PLACETEL_USER%">
    <action application="answer"/>
    <action application="sleep" data="1000"/>
-   <action application="play_and_get_digits" data="5 5 3 7000 # custom/conference_pin.mp3 custom/wrong_entry.mp3 pin \d+ 7000 1 XML hangup"/>
+   <action application="play_and_get_digits" data="5 5 3 7000 # conference/conf-pin.wav ivr/ivr-that_was_an_invalid_entry.wav pin \d+ 7000 1 XML hangup"/>
    <action application="transfer" data="SEND_TO_CONFERENCE XML public"/>
  </condition>
 </extension>

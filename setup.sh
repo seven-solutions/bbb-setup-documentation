@@ -51,6 +51,10 @@ wget $CONFIG_URL/bigbluebutton_sip_addr_map.conf -O /etc/nginx/conf.d/bigbluebut
 sed -e "s|%SERVER_IPV4|$SERVER_IPV4|g" -i /etc/nginx/conf.d/bigbluebutton_sip_addr_map.conf
 sed -e "s|%SERVER_IPV6|$SERVER_IPV6|g" -i /etc/nginx/conf.d/bigbluebutton_sip_addr_map.conf
 
+echo -e "
+# IPv6 Settings
+sed -e 's|proxy_pass .*;\?$|proxy_pass https://\$freeswitch_addr:7443;|g' -i /etc/bigbluebutton/nginx/sip.nginx" >> /etc/bigbluebutton/bbb-conf/apply-config.sh
+
 # /etc/bigbluebutton/nginx/sip.nginx
 wget $CONFIG_URL/sip.nginx -O /etc/bigbluebutton/nginx/sip.nginx
 # /opt/freeswitch/conf/sip_profiles/external_ipv6.xml
@@ -138,17 +142,17 @@ PLACETEL_USER=
 PLACETEL_PASSWORD=
 PLACETEL_NUMBER=
 
-wget $CONFIG_URL/sip_profile_placetel.xml -O /opt/freeswitch/conf/sip_profile/external/freeswitch.xml
-sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/sip_profile/external/freeswitch.xml
-sed -e "s|%PLACETEL_PASSWORD%|$PLACETEL_PASSWORD|g" -i /opt/freeswitch/conf/sip_profile/external/freeswitch.xml
+wget $CONFIG_URL/sip_profile_placetel.xml -O /opt/freeswitch/conf/sip_profiles/external/placetel.xml
+sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/sip_profiles/external/placetel.xml
+sed -e "s|%PLACETEL_PASSWORD%|$PLACETEL_PASSWORD|g" -i /opt/freeswitch/conf/sip_profiles/external/placetel.xml
 
-wget $CONFIG_URL/dialplan_placetel.xml -O /opt/freeswitch/conf/dialplan/public/freeswitch.xml
-sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/dialplan/public/freeswitch.xml
-
-sed -e "s|^defaultDialAccessNumber=.*$|defaultDialAccessNumber=$PLACETEL_NUMBER|g" -i /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+wget $CONFIG_URL/dialplan_placetel.xml -O /opt/freeswitch/conf/dialplan/public/placetel.xml
+sed -e "s|%PLACETEL_USER%|$PLACETEL_USER|g" -i /opt/freeswitch/conf/dialplan/public/placetel.xml
 
 # Firewall
 echo -e "
+## Placetel Settings
+sed -e 's|^defaultDialAccessNumber=.*$|defaultDialAccessNumber=$PLACETEL_NUMBER|g' -i /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 # Placetel firewall rules
 ufw allow from 185.79.24.0/22 to any port 5060
 ufw allow from 185.79.24.0/22 to any port 8933
@@ -159,24 +163,27 @@ bbb-conf --restart
 
 ### Custom greenlight
 # Clone the correct custom branch
-mv ~/greenlight ~/greenlight_old
-cd ~/greenlight_old
+cd greenlight
 docker-compose down
+mv ~/greenlight ~/greenlight_old
 cd ~
 git clone https://github.com/seven-solutions/greenlight.git
+cd ~/greenlight
 git checkout custom # or choose a branded custom branch
-cp ~/greenlight-old/.env ~/greenlight/.env
-cp -r ~/greenlight-old/db ~/greenlight/
+cp ~/greenlight_old/.env ~/greenlight/.env
+cp -r ~/greenlight_old/db ~/greenlight/
 cp ~/greenlight_old/docker-compose.yml ~/greenlight/docker-compose.yml
 yq w -i ~/greenlight/docker-compose.yml services.app.image 'greenlight-custom:release-v2'
 ./scripts/image_build.sh greenlight-custom release-v2
 docker-compose up -d
+cd ~
 
 # bbb-rec-perm
 git clone https://github.com/ichdasich/bbb-rec-perm
 apt -y install fcgiwrap python3-bcrypt python3-psycopg2 python3-bs4
-mv bbb-rec-perm/gl-auth/auth-passwd-bbb.py /var/www/html/gl-auth/auth.py
-db_pass=$(cat docker-compose.yml | grep -oP 'POSTGRES_PASSWORD=\K.*$');
+mkdir -p /var/www/html/gl-auth
+mv ~/bbb-rec-perm/gl-auth/auth-passwd-bbb.py /var/www/html/gl-auth/auth.py
+db_pass=$(cat ~/greenlight/docker-compose.yml | grep -oP 'POSTGRES_PASSWORD=\K.*$');
 sed -i -e 's/password=PASSWORD/password='$db_pass'/g' /var/www/html/gl-auth/auth.py
 cp -r ~/bbb-rec-perm/nginx-config/etc/bigbluebutton/nginx/* /etc/bigbluebutton/nginx
 wget $CONFIG_URL/bbb-rec-perm.nginx -O /etc/bigbluebutton/nginx/bbb-rec-perm.nginx

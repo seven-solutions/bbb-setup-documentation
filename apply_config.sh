@@ -27,10 +27,8 @@ yq w -i /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml log.level 'er
 sed -e 's|^export GST_DEBUG=\(.*\)\?|export GST_DEBUG="1"|g' -i /etc/default/kurento-media-server
 
 # Static file content
-cat 'Nothing to see here.' > /var/www/bigbluebutton-default/index.html
 cp /var/www/bigbluebutton-default/default_modified.pdf /var/www/bigbluebutton-default/default.pdf
 cp /var/www/bigbluebutton-default/default_modified.pptx /var/www/bigbluebutton-default/default.pptx
-cp /var/www/bigbluebutton-default/images/favicon_modified.ico /var/www/bigbluebutton-default/images/favicon.ico
 
 # STUN
 sed -i 's/stun:stun.freeswitch.org/stun:%TURN_SERVER/g' /usr/share/bbb-web/WEB-INF/classes/spring/turn-stun-servers.xml
@@ -50,9 +48,3 @@ sed -e 's|<logger name="\(.*\)" level=".*" />|\<logger name="\1" level="ERROR" /
 # Red5
 sed -e 's|<level .*/></logger>|\<level value="ERROR"/></logger>|g' -i /etc/red5/logback.xml
 sed -e 's|<logger name="\(.*\)" level=".*" />|\<logger name="\1" level="ERROR" />|g' -i /etc/red5/logback.xml
-
-# Placetel firewall rules
-ufw allow from 185.79.24.0/22 to any port 5060
-ufw allow from 185.79.24.0/22 to any port 8933
-ufw deny from any to any port 5060
-ufw deny from any to any port 8933
