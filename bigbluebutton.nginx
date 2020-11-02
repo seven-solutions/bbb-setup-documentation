@@ -53,11 +53,11 @@ server {
     }
 
     # BigBlueButton landing page.
-    #        location / {
-    #          root   /var/www/bigbluebutton-default;
-    #          index  index.html index.htm;
-    #	  expires 1m;
-    #        }
+    location / {
+        root   /var/www/bigbluebutton-default;
+        index  index.html index.htm;
+        expires 1m;
+    }
 
     # Include specific rules for record and playback
     include /etc/bigbluebutton/nginx/*.nginx;

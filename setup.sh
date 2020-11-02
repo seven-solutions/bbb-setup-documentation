@@ -55,8 +55,6 @@ echo -e "
 # IPv6 Settings
 sed -e 's|proxy_pass .*;\?$|proxy_pass https://\$freeswitch_addr:7443;|g' -i /etc/bigbluebutton/nginx/sip.nginx" >> /etc/bigbluebutton/bbb-conf/apply-config.sh
 
-# /etc/bigbluebutton/nginx/sip.nginx
-wget $CONFIG_URL/sip.nginx -O /etc/bigbluebutton/nginx/sip.nginx
 # /opt/freeswitch/conf/sip_profiles/external_ipv6.xml
 wget $CONFIG_URL/external_ipv6.xml -O /opt/freeswitch/conf/sip_profiles/external_ipv6.xml
 
@@ -94,10 +92,10 @@ docker exec greenlight-v2 bundle exec rake admin:create
 ### More privacy in recordings
 
 git clone https://github.com/OskarCarl/bbb-recording-archive-workaround.git
-cp bbb-recording-archive-workaround/etc/sudoers.d/bbb-autodelete /etc/sudoers.d/bbb-autodelte
-chmod 0440  /etc/sudoers.d/bbb-autodelte
-cp bbb-recording-archive-workaround/usr/local/bigbluebutton/core/scripts/post_archive/delete_raw_if_no_recording.rb /usr/local/bigbluebutton/core/scripts/post_archive/delete_raw_if_no_recording.rb
-cp /usr/local/bigbluebutton/core/scripts/archive/archive.rb bbb-recording-archive-workaround/usr/local/bigbluebutton/core/scripts/archive/archive.rb
+cp ~/bbb-recording-archive-workaround/etc/sudoers.d/bbb-autodelete /etc/sudoers.d/bbb-autodelte
+chmod 0440 /etc/sudoers.d/bbb-autodelte
+cp ~/bbb-recording-archive-workaround/usr/local/bigbluebutton/core/scripts/post_archive/delete_raw_if_no_recording.rb /usr/local/bigbluebutton/core/scripts/post_archive/delete_raw_if_no_recording.rb
+cp ~/bbb-recording-archive-workaround/usr/local/bigbluebutton/core/scripts/archive/archive.rb /usr/local/bigbluebutton/core/scripts/archive/archive.rb
 
 ### Firewall
 ### this is already done in apply config
@@ -165,8 +163,8 @@ bbb-conf --restart
 # Clone the correct custom branch
 cd greenlight
 docker-compose down
-mv ~/greenlight ~/greenlight_old
 cd ~
+mv ~/greenlight ~/greenlight_old
 git clone https://github.com/seven-solutions/greenlight.git
 cd ~/greenlight
 git checkout custom # or choose a branded custom branch
@@ -182,7 +180,9 @@ cd ~
 git clone https://github.com/ichdasich/bbb-rec-perm
 apt -y install fcgiwrap python3-bcrypt python3-psycopg2 python3-bs4
 mkdir -p /var/www/html/gl-auth
-mv ~/bbb-rec-perm/gl-auth/auth-passwd-bbb.py /var/www/html/gl-auth/auth.py
+mkdir -p /var/www/html/bbb
+cp ~/bbb-rec-perm/gl-auth/auth-passwd-bbb.py /var/www/html/gl-auth/auth.py
+cp ~/bbb-rec-perm/error-page/index.html /var/www/html/bbb/index.html
 db_pass=$(cat ~/greenlight/docker-compose.yml | grep -oP 'POSTGRES_PASSWORD=\K.*$');
 sed -i -e 's/password=PASSWORD/password='$db_pass'/g' /var/www/html/gl-auth/auth.py
 cp -r ~/bbb-rec-perm/nginx-config/etc/bigbluebutton/nginx/* /etc/bigbluebutton/nginx

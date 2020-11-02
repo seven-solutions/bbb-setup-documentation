@@ -48,3 +48,7 @@ sed -e 's|<logger name="\(.*\)" level=".*" />|\<logger name="\1" level="ERROR" /
 # Red5
 sed -e 's|<level .*/></logger>|\<level value="ERROR"/></logger>|g' -i /etc/red5/logback.xml
 sed -e 's|<logger name="\(.*\)" level=".*" />|\<logger name="\1" level="ERROR" />|g' -i /etc/red5/logback.xml
+
+# bbb-recording-archive-workaround
+cp ~/bbb-recording-archive-workaround/usr/local/bigbluebutton/core/scripts/post_archive/delete_raw_if_no_recording.rb /usr/local/bigbluebutton/core/scripts/post_archive/delete_raw_if_no_recording.rb
+cp ~/bbb-recording-archive-workaround/usr/local/bigbluebutton/core/scripts/archive/archive.rb /usr/local/bigbluebutton/core/scripts/archive/archive.rb

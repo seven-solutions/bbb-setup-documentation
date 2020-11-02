@@ -14,3 +14,8 @@ location = /auth {
     proxy_set_header        Content-Length "";
     proxy_set_header        X-Original-URI $request_uri;
 }
+
+location = /bbb/index.html {
+    root /var/www/html/;
+    index index.html;
+}
