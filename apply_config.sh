@@ -5,9 +5,11 @@ source /etc/bigbluebutton/bbb-conf/apply-lib.sh
 enableUFWRules
 
 # bigbluebutton.properties
+WELCOME_MESSAGE='=Welcome to <b>%%CONFNAME%%<\/b>!<br>some sample text <a href="event:http:\/\/www.bigbluebutton.org\/html5"><u>link text<\/u><\/a>.<br><br>Other stuff'
+WELCOME_FOOTER='This server runs on muffins! <a href="https:\/\/your-website.tld\/" target="_blank"><u>your website name<\/u><\/a>'
 sed -i 's/appLogLevel=.*/appLogLevel=Error/g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-sed -i 's/defaultWelcomeMessage=.*/defaultWelcomeMessage=Welcome to <b>%%CONFNAME%%<\/b>!<br>some sample text <a href="event:http:\/\/www.bigbluebutton.org\/html5"><u>link text<\/u><\/a>.<br><br>Other stuff/g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-sed -i 's/defaultWelcomeMessageFooter=.*/defaultWelcomeMessageFooter=This server runs on muffins! <a href="https:\/\/your-website.tld\/" target="_blank"><u>your website name<\/u><\/a>./g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i 's|defaultWelcomeMessage=.*|defaultWelcomeMessage='"$WELCOME_MESSAGE"'|g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+sed -i 's|defaultWelcomeMessageFooter=.*|defaultWelcomeMessageFooter='"$WELCOME_FOOTER"'|g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 sed -i 's/defaultMaxUsers=.*/defaultMaxUsers=150/g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 sed -i 's/maxInactivityTimeoutMinutes=.*/maxInactivityTimeoutMinutes=35/g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
 sed -i 's/warnMinutesBeforeMax=.*/warnMinutesBeforeMax=5/g' /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
